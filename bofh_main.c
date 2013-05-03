@@ -78,8 +78,8 @@ static int __init bofh_init(void)
 
 	bofh_proc_file->read_proc	= &bofh_content;
 	bofh_proc_file->mode		= S_IFREG | S_IRUGO;
-	bofh_proc_file->uid.val		= 0;
-	bofh_proc_file->gid.val		= 0;
+	bofh_proc_file->uid	        = GLOBAL_ROOT_UID;
+	bofh_proc_file->gid	        = GLOBAL_ROOT_GID;
 	bofh_proc_file->size		= 0;
 
 	pr_debug("BOFH module inititialized!\n");
