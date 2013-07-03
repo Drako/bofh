@@ -30,7 +30,7 @@
 /* the BOFH exuses */
 #include "bofh_excuses.h"
 
-struct proc_dir_entry *bofh_proc_file;
+static struct proc_dir_entry *bofh_proc_file;
 
 /* here the file /proc/{BOFH_FILENAME} is filled with content */
 static int bofh_content(struct seq_file *m, void *v)
@@ -60,7 +60,7 @@ static int bofh_open(struct inode * inode, struct file * file)
 
 static int __init bofh_init(void)
 {
-    struct file_operations ops = {
+    static struct file_operations ops = {
         .owner   = THIS_MODULE,
         .open    = &bofh_open,
         .read    = &seq_read,
