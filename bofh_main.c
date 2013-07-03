@@ -21,6 +21,7 @@
 #include <linux/module.h>
 #include <linux/kernel.h>
 #include <linux/proc_fs.h>
+#include <linux/seq_file.h>
 #include <linux/random.h>
 
 /* the filename under /proc/ */
@@ -32,14 +33,7 @@
 struct proc_dir_entry *bofh_proc_file;
 
 /* here the file /proc/{BOFH_FILENAME} is filled with content */
-int bofh_content(
-	char *buffer,
-	char **buffer_location,
-	off_t offset,
-	int buffer_length,
-	int *eof,
-	void *data
-)
+static int bofh_content(struct seq_file *m, void *v)
 {
 	char const *excuse;
 	size_t len;
@@ -47,40 +41,43 @@ int bofh_content(
 	/* the index of the chosen excuse... gets a random value */
 	unsigned int index;
 
-	int ret;
-
 	get_random_bytes(&index, sizeof(unsigned int));
 	index %= max_excuse;
 
 	excuse = excuses[index];
 	len = strlen(excuse);
 
-	if (offset > 0)
-		ret = 0;
-	else {
-		pr_alert("kmod_bofh: Return BOFH excuse #%d: %s\n",
-			index, excuse);
-		ret = snprintf(buffer, buffer_length, "%s\n", excuse + offset);
-	}
+	pr_alert("kmod_bofh: Return BOFH excuse #%d: %s\n", index, excuse);
+	seq_printf(m, "%s\n", excuse);
 
-	*eof = 1;
-	return ret;
+	return 0;
+}
+
+static int bofh_open(struct inode * inode, struct file * file)
+{
+	return single_open(file, &bofh_content, NULL);
 }
 
 static int __init bofh_init(void)
 {
-	bofh_proc_file = create_proc_entry(BOFH_FILENAME, 0644, NULL);
+	struct file_operations ops = {
+		.owner   = THIS_MODULE,
+		.open  	 = &bofh_open,
+    	.read    = &seq_read,
+    	.llseek	 = &seq_lseek,
+    	.release = &single_release,
+	};
+
+	bofh_proc_file = proc_create(BOFH_FILENAME, 0644, NULL, &ops);
+
 	if (unlikely(bofh_proc_file == NULL)) {
 		pr_alert("Error: kmod_bofh could not initialize /proc/%s\n",
 			BOFH_FILENAME);
 		return -ENOMEM;
 	}
 
-	bofh_proc_file->read_proc	= &bofh_content;
-	bofh_proc_file->mode		= S_IFREG | S_IRUGO;
-	bofh_proc_file->uid	        = GLOBAL_ROOT_UID;
-	bofh_proc_file->gid	        = GLOBAL_ROOT_GID;
-	bofh_proc_file->size		= 0;
+	proc_set_user(bofh_proc_file, GLOBAL_ROOT_UID, GLOBAL_ROOT_GID);
+	proc_set_size(bofh_proc_file, 0);
 
 	pr_debug("BOFH module inititialized!\n");
 	return 0;
@@ -88,7 +85,7 @@ static int __init bofh_init(void)
 
 static void __exit bofh_exit(void)
 {
-	remove_proc_entry(BOFH_FILENAME, NULL);
+	remove_proc_entry(BOFH_FILENAME, bofh_proc_file);
 	pr_debug("BOFH module uninitialized!\n");
 }
 
