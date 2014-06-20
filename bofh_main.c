@@ -81,10 +81,11 @@ static int __init bofh_init(void)
     /* I don't know the exact version at which proc_set_user was introduced... */
     bofh_proc_file->uid = 0;
     bofh_proc_file->gid = 0;
+    bofh_proc_file->size = 0;
 #else
     proc_set_user(bofh_proc_file, GLOBAL_ROOT_UID, GLOBAL_ROOT_GID);
-#endif
     proc_set_size(bofh_proc_file, 0);
+#endif
 
     pr_debug("BOFH module inititialized!\n");
     return 0;
