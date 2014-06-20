@@ -6,5 +6,10 @@ before_install: sudo apt-get update -qq
 
 install: sudo apt-get install -yq build-essential linux-headers-generic
 
-script: make modules kernel_version=3.2.0-64-generic
+script:
+    - make modules kernel_version=3.2.0-64-generic
+    - sudo insmod bofh.ko
+    - cat /proc/excuse
+    - cat /proc/excuse
+    - cat /proc/excuse
 
