@@ -1,0 +1,10 @@
+language: c
+
+compiler: gcc
+
+before_install: sudo apt-get update -qq
+
+install: sudo apt-get install -qq build-essential linux-headers-generic
+
+script: make
+
