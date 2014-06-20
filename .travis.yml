@@ -6,9 +6,7 @@ before_install: sudo apt-get update -qq
 
 install: sudo apt-get install -yq build-essential linux-headers-generic
 
-before-script:
+script:
     - ls /usr/lib/modules/
     - ls /lib/modules/
-
-script: make
 
