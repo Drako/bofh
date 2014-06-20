@@ -23,6 +23,7 @@
 #include <linux/proc_fs.h>
 #include <linux/seq_file.h>
 #include <linux/random.h>
+#include <linux/version.h>
 
 /* the filename under /proc/ */
 #define BOFH_FILENAME "excuse"
@@ -76,7 +77,14 @@ static int __init bofh_init(void)
         return -ENOMEM;
     }
 
+#if LINUX_VERSION_CODE <= KERNEL_VERSION(3, 2, 0)
+    /* this issue could also exist for kernels
+     * newer than 3.2.0 but older than 3.15.1 */
+    bofh_proc_file->uid = 0;
+    bofh_proc_file->gid = 0;
+#else
     proc_set_user(bofh_proc_file, GLOBAL_ROOT_UID, GLOBAL_ROOT_GID);
+#endif
     proc_set_size(bofh_proc_file, 0);
 
     pr_debug("BOFH module inititialized!\n");
