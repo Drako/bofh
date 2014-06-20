@@ -77,8 +77,7 @@ static int __init bofh_init(void)
         return -ENOMEM;
     }
 
-#if LINUX_VERSION_CODE < KERNEL_VERSION(3, 15, 0)
-    /* I don't know the exact version at which proc_set_user was introduced... */
+#if LINUX_VERSION_CODE < KERNEL_VERSION(3, 10, 0)
     bofh_proc_file->uid = 0;
     bofh_proc_file->gid = 0;
     bofh_proc_file->size = 0;
