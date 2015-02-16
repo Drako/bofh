@@ -484,5 +484,5 @@ static char const *excuses_[] = {
 
 char const **excuses = excuses_;
 
-unsigned int max_excuse = 462;
+unsigned int max_excuse = sizeof(excuses_) / sizeof(char*);
 
