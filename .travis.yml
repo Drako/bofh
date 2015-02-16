@@ -6,5 +6,5 @@ before_install: sudo apt-get update -qq
 
 install: sudo apt-get install -yq build-essential linux-headers-generic
 
-script: ls /lib/modules/; make modules
+script: make kernel_version=3.2.0-76-generic modules
 
