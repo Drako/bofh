@@ -54,37 +54,31 @@ static int bofh_content(struct seq_file *m, void *v)
     return 0;
 }
 
-static int bofh_open(struct inode * inode, struct file * file)
+static int bofh_open(struct inode *inode, struct file *file)
 {
     return single_open(file, &bofh_content, NULL);
 }
 
 static int __init bofh_init(void)
 {
-    static struct file_operations ops = {
-        .owner   = THIS_MODULE,
-        .open    = &bofh_open,
-        .read    = &seq_read,
-        .llseek  = &seq_lseek,
-        .release = &single_release,
+    static struct proc_ops ops = {
+        .proc_open = &bofh_open,
+        .proc_read = &seq_read,
+        .proc_lseek = &seq_lseek,
+        .proc_release = &single_release,
     };
 
     bofh_proc_file = proc_create(BOFH_FILENAME, 0644, NULL, &ops);
 
-    if (unlikely(bofh_proc_file == NULL)) {
+    if (unlikely(bofh_proc_file == NULL))
+    {
         pr_alert("Error: kmod_bofh could not initialize /proc/%s\n",
-            BOFH_FILENAME);
+                 BOFH_FILENAME);
         return -ENOMEM;
     }
 
-#if LINUX_VERSION_CODE < KERNEL_VERSION(3, 10, 0)
-    bofh_proc_file->uid = 0;
-    bofh_proc_file->gid = 0;
-    bofh_proc_file->size = 0;
-#else
     proc_set_user(bofh_proc_file, GLOBAL_ROOT_UID, GLOBAL_ROOT_GID);
     proc_set_size(bofh_proc_file, 0);
-#endif
 
     pr_debug("BOFH module inititialized!\n");
     return 0;
@@ -102,4 +96,3 @@ module_exit(bofh_exit);
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Felix Bytow");
 MODULE_DESCRIPTION("A BOFH excuse module");
-

@@ -1,3 +1,6 @@
+# VSCode stuff
+.vscode/
+
 # Object files
 *.o
 
@@ -5,4 +8,7 @@
 *.ko
 *.order
 *.symvers
+*.cmd
+*.mod.c
+*.mod
 
